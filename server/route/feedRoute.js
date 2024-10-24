@@ -23,7 +23,7 @@ router.route("/")
                     LEFT JOIN 
                         REACT_BOARD_LIKE L ON B.BOARD_NO = L.BOARD_NO 
                     LEFT JOIN 
-                        REACT_USER U ON B.USER_ID = U.USER_ID  -- REACT_USER 테이블 조인
+                        REACT_USER U ON B.USER_ID = U.USER_ID
                     GROUP BY 
                         B.BOARD_NO, U.NICKNAME`;
         connection.query(query,(err,results)=>{
@@ -48,8 +48,52 @@ router.route("/:boardNo")
             res.json({success : true});
         })
     })
-// router.route("/likeCheck")
 
-
-
+router.route("/comment/:boardNo")
+    .get((req,res)=>{
+        const boardNo = req.params.boardNo;
+        const query = `SELECT * FROM 
+                        REACT_COMMENT C
+                        INNER JOIN REACT_USER U ON C.USER_ID = U.USER_ID WHERE BOARD_NO = ?`;
+        connection.query(query,[boardNo],(err,results)=>{
+            if(err){
+                console.log("실패");
+                return res.json({success : false , message : "실패"});
+            };
+            res.json({ success: true, commentList: results });
+        })    
+    })
+router.route("/board/:boardNo")
+    .get((req,res)=>{
+        const boardNo = req.params.boardNo;
+        const query = `SELECT 
+                        B.BOARD_NO, 
+                        B.USER_ID, 
+                        U.NICKNAME,
+                        B.BOARD_CONTENTS,
+                        B.HASHTAG1, 
+                        B.HASHTAG2, 
+                        B.HASHTAG3, 
+                        B.HASHTAG4, 
+                        B.HASHTAG5, 
+                        B.HASHTAG6,
+                        DATE_FORMAT(B.CDATETIME, '%d.%m.%y.%H:%i') AS CDATETIME,
+                        COUNT(L.USER_ID) AS LIKE_COUNT 
+                    FROM 
+                        REACT_BOARD B 
+                    LEFT JOIN 
+                        REACT_BOARD_LIKE L ON B.BOARD_NO = L.BOARD_NO 
+                    LEFT JOIN 
+                        REACT_USER U ON B.USER_ID = U.USER_ID
+                    WHERE B.BOARD_NO = ?
+                    GROUP BY 
+                        B.BOARD_NO, U.NICKNAME`
+        connection.query(query,[boardNo],(err,results)=>{
+            if(err){
+                console.log("실패");
+                return res.json({success : false , message : "실패"});
+            };
+            res.json({ success: true, boardDetail: results[0] });
+        })
+    })
 module.exports = router;
