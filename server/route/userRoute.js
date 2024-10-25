@@ -42,7 +42,7 @@ router.route("/login")
             if(err) throw err;
             if(results.length > 0){
                 const user = results[0];
-                const token = jwt.sign({userId : user.USER_ID,name : user.NAME,nickname : user.NICKNAME},JWT_KEY,{expiresIn : '1h'})
+                const token = jwt.sign({userId : user.USER_ID,name : user.NAME,nickname : user.NICKNAME},JWT_KEY,{expiresIn : '6h'})
                 console.log(token);
                 res.json({success : true ,message : "Login success" , token : token});
             }else{

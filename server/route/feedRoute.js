@@ -2,6 +2,9 @@ const express = require('express')
 const router = express.Router();
 const connection = require('../db');
 const jwtAuthentication = require('../jwtAuth');
+const multer  = require('multer');
+const path = require('path');
+
 
 router.route("/")
     .get(jwtAuthentication,(req,res)=>{
@@ -10,12 +13,6 @@ router.route("/")
                         B.USER_ID, 
                         U.NICKNAME,
                         B.BOARD_CONTENTS,
-                        B.HASHTAG1, 
-                        B.HASHTAG2, 
-                        B.HASHTAG3, 
-                        B.HASHTAG4, 
-                        B.HASHTAG5, 
-                        B.HASHTAG6,
                         DATE_FORMAT(B.CDATETIME, '%d.%m.%y.%H:%i') AS CDATETIME,
                         COUNT(L.USER_ID) AS LIKE_COUNT 
                     FROM 
@@ -48,7 +45,32 @@ router.route("/:boardNo")
             res.json({success : true});
         })
     })
-
+router.route("/like/:boardNo")
+    .put((req,res)=>{
+        const boardNo = req.params.boardNo;
+        const {userId} = req.body;
+        const checkquery = `SELECT COUNT(*) AS count FROM REACT_BOARD_LIKE WHERE BOARD_NO = ? AND USER_ID = ?`
+        connection.query(checkquery,[boardNo,userId],(err,results)=>{
+            if(results[0].count > 0){
+                const deletequery = `DELETE FROM REACT_BOARD_LIKE WHERE BOARD_NO = ? AND USER_ID = ?`
+                connection.query(deletequery,[boardNo,userId],(err,results)=>{
+                    if(err){
+                        return res.json({success : false , message : "좋아요취소 오류"});
+                    }else{
+                        return res.json({success : true , message : "좋아요가 취소 되었습니다."});
+                    }
+                })
+            }else if(results[0].count == 0){
+                const query = `INSERT INTO REACT_BOARD_LIKE(BOARD_NO,USER_ID) VALUES(?,?)`
+                connection.query(query,[boardNo,userId],(err,results)=>{
+                    if(err){
+                        return res.json({success : false , message : "좋아요안눌림"});
+                    }
+                    res.json({success : true , message : "좋아요를 눌렀습니다."});
+                })
+            }
+        })
+    })
 router.route("/comment/:boardNo")
     .get((req,res)=>{
         const boardNo = req.params.boardNo;
@@ -71,12 +93,6 @@ router.route("/board/:boardNo")
                         B.USER_ID, 
                         U.NICKNAME,
                         B.BOARD_CONTENTS,
-                        B.HASHTAG1, 
-                        B.HASHTAG2, 
-                        B.HASHTAG3, 
-                        B.HASHTAG4, 
-                        B.HASHTAG5, 
-                        B.HASHTAG6,
                         DATE_FORMAT(B.CDATETIME, '%d.%m.%y.%H:%i') AS CDATETIME,
                         COUNT(L.USER_ID) AS LIKE_COUNT 
                     FROM 
@@ -96,4 +112,59 @@ router.route("/board/:boardNo")
             res.json({ success: true, boardDetail: results[0] });
         })
     })
+//파일등록
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        console.log(file);
+        cb(null, '../server/img/'); // 서버 내 img 폴더
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname); // 파일 확장자
+        cb(null, Date.now() + ext); // 날짜 데이터를 이용해서 파일 이름으로 저장
+    },
+});
+    
+// 파일 업로드 미들웨어 설정
+const upload = multer({ storage: storage });
+    
+    
+    // 이미지 및 피드 업로드 API
+router.route("/insert")
+    .post(upload.array('images'), (req, res) => {
+        const { content } = req.body; // 피드의 내용
+    
+        // 피드 먼저 등록
+        const feedQuery = 'INSERT INTO REACT_BOARD (USER_ID, BOARD_CONTENTS) VALUES (?, ?)';
+        const userId = "test"; // 사용자의 ID, 하드코딩으로 대체
+    
+        connection.query(feedQuery, [userId, content], (err, feedResult) => {
+        if (err) {
+            console.error('피드 등록 실패:', err);
+            return res.json({ success: false, message: "피드 등록 실패" });
+        }
+    
+        const boardNo = feedResult.insertId; // 등록된 피드의 ID 가져오기
+    
+        // 이제 이미지를 등록할 차례
+        const files = req.files;
+    
+        if (!files || files.length === 0) {
+            return res.json({ success: false, message: "파일이 업로드되지 않았습니다." });
+        }
+    
+        // 이미지 경로들을 DB에 저장
+        const imgQuery = 'INSERT INTO REACT_BOARD_ATTACH (BOARD_NO, ATTACH_PATH1) VALUES ?';
+        const imgData = files.map(file => [boardNo, file.path]);
+        console.log(imgData);
+    
+        connection.query(imgQuery, [imgData], (err, imgResult) => {
+            if (err) {
+            console.error('이미지 저장 실패:', err);
+            return res.status(500).json({ success: false, message: "이미지 저장 실패" });
+            }
+    
+            res.json({ success: true, message: "피드 및 파일이 성공적으로 저장되었습니다!" });
+        });
+        });
+    });
 module.exports = router;

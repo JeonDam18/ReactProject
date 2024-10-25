@@ -1,30 +1,40 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../add.css';
+import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from 'react-router-dom'; 
 
 function FeedInsert(props) {
+useEffect(()=>{
+  console.log(dToken.userId);
+},[])
+const navigate = useNavigate();
+const token = localStorage.getItem("token");
+const dToken = jwtDecode(token);
 const [content, setContent] = useState('');
 const [images, setImages] = useState([]);
 const imageChange = (e) => {
-    setImages(e.target.files);
+    setImages(Array.from(e.target.files));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    const token =localStorage.getItem("token");
     const formData = new FormData();
     formData.append('content', content);
+    formData.append('userId',dToken.userId)
     for (let i = 0; i < images.length; i++) {
       formData.append('images', images[i]);
     }
 
     try {
-      const response = await axios.post('http://localhost:3100/feed', formData, {
+      const response = await axios.post('http://localhost:3100/feed/insert', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
       alert(response.data.message);
+      navigate("/profile");
       // 폼 초기화
       setContent('');
       setImages([]);

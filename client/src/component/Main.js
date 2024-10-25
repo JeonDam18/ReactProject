@@ -15,7 +15,6 @@ const [currentBoardNo, setCurrentBoardNo] = useState(null);
 const navigate = useNavigate();
 const token = localStorage.getItem("token");
 const dToken = jwtDecode(token);
-
 useEffect(()=>{
     feedList();
 },[])
@@ -44,6 +43,20 @@ async function feedList(){
         console.log("피드 오류:", error.response ? error.response.data : error.message);
     }
 }
+async function likes(boardNo){
+    console.log("좋아요!!!! "+boardNo);
+    try {
+        const res = await axios.put(`http://localhost:3100/feed/like/${boardNo}`,{
+            userId : dToken.userId , boardNo : boardNo
+        })
+        if(res.data.success){
+            alert(res.data.message);
+            window.location.reload();
+        }
+    } catch (error) {
+        console.log("좋아요 오류");
+    }
+}
 async function handleComment(boardNo) {
     console.log(dToken.userId);
     console.log(inputComment);
@@ -64,10 +77,13 @@ async function handleComment(boardNo) {
         <div className="container">
             <aside className="sidebar">
                 <a href="#">홈</a>
-                <a href="#" onClick={()=>{navigate("/profile")}}>프로필</a>
+                <a href="#" onClick={()=>{
+                    navigate(`/profile/${dToken.userId}`);
+                    console.log(dToken.userId);
+                    }}>프로필</a>
                 <a href="#">검색</a>
                 <a href="#" onClick={()=>{navigate("/login")}}>로그아웃</a>
-                <a href="#" onClick={()=>{}}><img className="icon" src="http://localhost:3100/img/add.png"/></a>
+                <a href="#" onClick={()=>{navigate("/feedInsert")}}><img className="icon" src="http://localhost:3100/img/add.png"/></a>
             </aside>
             <main className="main">
                 <div className="feed">
@@ -75,7 +91,7 @@ async function handleComment(boardNo) {
                         <div key={feed.BOARD_NO} className="post">
                             <div className="content">
                                 <div className="header">
-                                    <a href="#"><p className="nickname">{feed.NICKNAME}</p></a>
+                                    <a href={`/profile/${feed.USER_ID}`}><p className="nickname">{feed.NICKNAME}</p></a>
                                     <p className="datetime">{feed.CDATETIME}</p>
                                 </div>
                                 <img
@@ -86,7 +102,10 @@ async function handleComment(boardNo) {
                                 <span className="nickname">{feed.NICKNAME}</span>
                                 <p className="board-contents">{feed.BOARD_CONTENTS}</p>
                                 <div className="actions">
-                                    <span className="like">❤️</span>
+                                    <span className="like" onClick={()=>{
+                                        console.log(feed.BOARD_NO);
+                                        likes(feed.BOARD_NO);
+                                    }}>❤️</span>
                                     <span>{feed.LIKE_COUNT}</span>
                                 </div>
                                 <a href="#" onClick={()=> openComments(feed.BOARD_NO)}>댓글보기</a>
@@ -97,7 +116,7 @@ async function handleComment(boardNo) {
                                 }}>😊</button>
                             </div>
                         </div>
-                    ))}
+                    ))}  
                 </div>
                 {showPopup && <CommentPopup boardNo={currentBoardNo} onClose={closePopup} />}
             </main>
@@ -108,7 +127,7 @@ async function handleComment(boardNo) {
 const Footer = () => {
     return (
         <footer className="footer">
-            <p>© 2024 Instagram</p>
+            <p>© 2024 Catch up</p>
         </footer>
     );
 };

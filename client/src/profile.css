@@ -1,0 +1,59 @@
+.profile-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.nickname {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.follower-info {
+    margin: 10px 0;
+}
+
+.followers,
+.following {
+    margin: 0 10px;
+    font-size: 16px;
+}
+
+.follow-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #0095f6;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.follow-button:hover {
+    background-color: #007bbf;
+}
+
+.images-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.image-item {
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.image-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
