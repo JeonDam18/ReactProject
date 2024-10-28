@@ -34,7 +34,7 @@ const imageChange = (e) => {
         },
       });
       alert(response.data.message);
-      navigate("/profile");
+      navigate(`/profile/${dToken.userId}`);
       // 폼 초기화
       setContent('');
       setImages([]);

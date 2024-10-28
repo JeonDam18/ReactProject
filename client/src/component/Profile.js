@@ -3,17 +3,27 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import '../profile.css';
+import { useNavigate } from 'react-router-dom';
+import CommentPopup from './CommentPopup';
+
 const token = localStorage.getItem("token");
 const dToken = jwtDecode(token);
 
 function Profile(props) {
 const { userId } = useParams();
 const [userDetail , setUserDetail] = useState({});
+const [feedList ,setFeedList] = useState([]);
+const [showPopup, setShowPopup] = useState(false);
+const [currentBoardNo, setCurrentBoardNo] = useState(null);
+const [followId , setFollowId] = useState();
+const [followCount , setFollowCount] = useState([]);
+const navigate = useNavigate();
+
 useEffect(()=>{
     profileDetail(userId);
-    console.log(userId);
-},[userId])
-console.log(dToken.userId);
+    userFeedList(userId);
+    handleFollowCount();
+},[userId,followId])
 async function profileDetail(userId){
     try {
         const res = await axios.get(`http://localhost:3100/profile`,{
@@ -23,45 +33,109 @@ async function profileDetail(userId){
             console.log("데이터가져옴");
             console.log(res.data.boardDetail);
             setUserDetail(res.data.boardDetail);
+            setFollowId(res.data.boardDetail.USER_ID);
         }
     } catch (error) {
         console.log("fail");
     }
 }
+async function userFeedList(userId){
+    try {
+        const res = await axios.get(`http://localhost:3100/profile/list`,{
+            params : {userId}
+        })
+        setFeedList(res.data.feedList);
+    } catch (error) {
+        console.log("fail");
+    }
+}
+async function handleFollowing(follower) {
+    if(dToken.userId != userId){
+        try {
+            const res = await axios.put(`http://localhost:3100/profile`,{
+                follow : dToken.userId , follower : follower
+            })
+            if(res.data.success){
+                alert(res.data.message);
+                window.location.reload();
+            }
+        } catch (error) {
+            console.log("error!!!!!!")
+        }
+    }else{
+        alert("자기 자신을 팔로우 할수 없습니다.");
+        return;
+    }
+}
+async function handleFollowCount(){
+    try {
+        console.log("이거 팔로우 아이디 "+ followId);
+        const res = await axios.get(`http://localhost:3100/profile/follower`,{
+            params: { follower: followId }
+        })
+        if(res.data.success){
+            setFollowCount(res.data.followCount);
+            console.log(followCount);
+        }else{
+            console.log("에러")
+        }
+    } catch (error) {
+        console.log("fail!");
+    }
+}
+const openPopup = (boardNo) => {
+    setCurrentBoardNo(boardNo);
+    setShowPopup(true);
+};
+
+const closePopup = () => {
+    setShowPopup(false);
+    setCurrentBoardNo(null);
+};
     return (
+        <div className="container">
+        <aside className="sidebar">
+            <a href="#" onClick={()=>{
+                navigate(`/main`);
+            }}>홈</a>
+            <a href="#" onClick={() => {
+                navigate(`/profile/${dToken.userId}`);
+                console.log(dToken.userId);
+            }}>프로필</a>
+            <a href="#">검색</a>
+            <a href="#" onClick={() => { navigate("/login"); }}>로그아웃</a>
+            <a href="#" onClick={() => { navigate("/feedInsert"); }}>
+                <img className="icon" src="http://localhost:3100/img/add.png" alt="추가" />
+            </a>
+        </aside>
         <div className="profile-container">
+            <a href="#" onClick={() => { navigate("/main"); }}>홈으로</a>
             <div className="profile-header">
                 <div className="profile-info">
                     <h2 className="nickname">{userDetail.NICKNAME}</h2>
                     <div className="follower-info">
-                        <span className="followers">팔로워: <strong>100</strong></span>
-                        <span className="following">팔로잉: <strong>50</strong></span>
+                        <span className="followers">팔로워: <strong>{followCount.follower_id_count}</strong></span>
+                        <span className="following">팔로우: <strong>{followCount.follow_id_count}</strong></span>
                     </div>
-                    <button className="follow-button">팔로잉</button>
+                    <button className="follow-button" onClick={() => {
+                        handleFollowing(userDetail.USER_ID);
+                    }}>팔로잉</button>
                 </div>
             </div>
 
             <div className="images-container">
-                <div className="image-item">
-                    <img src="image1.jpg" alt="이미지 1" />
-                </div>
-                <div className="image-item">
-                    <img src="image2.jpg" alt="이미지 2" />
-                </div>
-                <div className="image-item">
-                    <img src="image3.jpg" alt="이미지 3" />
-                </div>
-                <div className="image-item">
-                    <img src="image4.jpg" alt="이미지 4" />
-                </div>
-                <div className="image-item">
-                    <img src="image5.jpg" alt="이미지 5" />
-                </div>
-                <div className="image-item">
-                    <img src="image6.jpg" alt="이미지 6" />
-                </div>
+                {feedList.map((feed, index) => (
+                    <div key={index} className="image-item">
+                        <img src={feed.ATTACH_PATH1} onClick={() => openPopup(feed.BOARD_NO)} style={{ cursor: 'pointer' }} />
+                    </div>
+                ))}
             </div>
-        </div>                                  
+
+            {showPopup && (
+                <CommentPopup boardNo={currentBoardNo} onClose={closePopup} />
+            )}
+        </div>
+    </div>                                  
     );
 }
 

@@ -9,20 +9,23 @@ const path = require('path');
 router.route("/")
     .get(jwtAuthentication,(req,res)=>{
         const query = `SELECT 
-                        B.BOARD_NO, 
-                        B.USER_ID, 
-                        U.NICKNAME,
-                        B.BOARD_CONTENTS,
-                        DATE_FORMAT(B.CDATETIME, '%d.%m.%y.%H:%i') AS CDATETIME,
-                        COUNT(L.USER_ID) AS LIKE_COUNT 
-                    FROM 
-                        REACT_BOARD B 
-                    LEFT JOIN 
-                        REACT_BOARD_LIKE L ON B.BOARD_NO = L.BOARD_NO 
-                    LEFT JOIN 
-                        REACT_USER U ON B.USER_ID = U.USER_ID
-                    GROUP BY 
-                        B.BOARD_NO, U.NICKNAME`;
+                            B.BOARD_NO, 
+                            B.USER_ID, 
+                            U.NICKNAME,
+                            B.BOARD_CONTENTS,
+                            DATE_FORMAT(B.CDATETIME, '%d.%m.%y.%H:%i') AS CDATETIME,
+                            (SELECT COUNT(*) FROM REACT_BOARD_LIKE L WHERE L.BOARD_NO = B.BOARD_NO) AS LIKE_COUNT,
+                            GROUP_CONCAT(A.ATTACH_PATH1) AS IMAGE_URLS
+                        FROM 
+                            REACT_BOARD B 
+                        LEFT JOIN 
+                            REACT_USER U ON B.USER_ID = U.USER_ID
+                        LEFT JOIN 
+                            REACT_BOARD_ATTACH A ON B.BOARD_NO = A.BOARD_NO
+                        GROUP BY 
+                            B.BOARD_NO, U.NICKNAME
+                        ORDER BY 
+    CDATETIME DESC`;
         connection.query(query,(err,results)=>{
             if(err){
                 console.error('피드 조회 실패:', err);
@@ -88,20 +91,21 @@ router.route("/comment/:boardNo")
 router.route("/board/:boardNo")
     .get((req,res)=>{
         const boardNo = req.params.boardNo;
+        console.log("지금!!!!!!!!!!!!"+boardNo);
         const query = `SELECT 
                         B.BOARD_NO, 
                         B.USER_ID, 
                         U.NICKNAME,
                         B.BOARD_CONTENTS,
                         DATE_FORMAT(B.CDATETIME, '%d.%m.%y.%H:%i') AS CDATETIME,
-                        COUNT(L.USER_ID) AS LIKE_COUNT 
+                        (SELECT COUNT(*) FROM REACT_BOARD_LIKE L WHERE L.BOARD_NO = B.BOARD_NO) AS LIKE_COUNT,
+                        (SELECT GROUP_CONCAT(A.ATTACH_PATH1) FROM REACT_BOARD_ATTACH A WHERE A.BOARD_NO = B.BOARD_NO) AS IMAGE_URLS
                     FROM 
                         REACT_BOARD B 
                     LEFT JOIN 
-                        REACT_BOARD_LIKE L ON B.BOARD_NO = L.BOARD_NO 
-                    LEFT JOIN 
                         REACT_USER U ON B.USER_ID = U.USER_ID
-                    WHERE B.BOARD_NO = ?
+                    WHERE 
+                        B.BOARD_NO = ?
                     GROUP BY 
                         B.BOARD_NO, U.NICKNAME`
         connection.query(query,[boardNo],(err,results)=>{
@@ -109,6 +113,7 @@ router.route("/board/:boardNo")
                 console.log("실패");
                 return res.json({success : false , message : "실패"});
             };
+            console.log("지금!!!!!!!!!!!!"+JSON.stringify(results[0], null, 2));
             res.json({ success: true, boardDetail: results[0] });
         })
     })
@@ -131,11 +136,10 @@ const upload = multer({ storage: storage });
     // 이미지 및 피드 업로드 API
 router.route("/insert")
     .post(upload.array('images'), (req, res) => {
-        const { content } = req.body; // 피드의 내용
+        const { content,userId } = req.body; // 피드의 내용
     
         // 피드 먼저 등록
         const feedQuery = 'INSERT INTO REACT_BOARD (USER_ID, BOARD_CONTENTS) VALUES (?, ?)';
-        const userId = "test"; // 사용자의 ID, 하드코딩으로 대체
     
         connection.query(feedQuery, [userId, content], (err, feedResult) => {
         if (err) {
@@ -154,7 +158,10 @@ router.route("/insert")
     
         // 이미지 경로들을 DB에 저장
         const imgQuery = 'INSERT INTO REACT_BOARD_ATTACH (BOARD_NO, ATTACH_PATH1) VALUES ?';
-        const imgData = files.map(file => [boardNo, file.path]);
+        const imgData = files.map(file => {
+            const imagePath = `http://localhost:3100/img/${file.filename}`;
+            return [boardNo, imagePath]
+        });
         console.log(imgData);
     
         connection.query(imgQuery, [imgData], (err, imgResult) => {

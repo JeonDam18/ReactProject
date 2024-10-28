@@ -50,10 +50,12 @@
     border: 1px solid #e1e1e1;
     border-radius: 5px;
     overflow: hidden;
+    height: 200px; /* 이미지 높이를 고정 */
 }
 
 .image-item img {
     width: 100%;
-    height: auto;
+    height: 100%; /* 높이에 맞춰 이미지 크기 조절 */
+    object-fit: cover; /* 이미지 비율 유지하며 잘림 */
     display: block;
 }
