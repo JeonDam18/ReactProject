@@ -33,12 +33,21 @@ router.route("/")
             };
             res.json({ success: true, list: results });
         });
-    });
+    })
+    .delete((req,res)=>{
+        const {boardNo} = req.query;
+        const query = `DELETE FROM REACT_BOARD WHERE BOARD_NO = ?`
+        connection.query(query,[boardNo],(err,results)=>{
+                if(err){
+                    return res.json({success : false , message : "피드 삭제 실패"})
+                };
+                res.json({success : true, message : "게시글을 삭제하였습니다."});
+            })
+        })
 router.route("/:boardNo")
     .put((req,res)=>{
         const boardNo = req.params.boardNo;
         const{ userId, contents } = req.body;
-        console.log("boardNo : "+boardNo+"아이디랑 내용 : "+req.body);
         const query ='INSERT INTO REACT_COMMENT(BOARD_NO,USER_ID,COMMENT_CONTENTS) VALUES(?,?,?)';
         connection.query(query,[boardNo,userId,contents],(err,results)=>{
             if(err){
@@ -88,10 +97,20 @@ router.route("/comment/:boardNo")
             res.json({ success: true, commentList: results });
         })    
     })
+router.route("/commentDelete")
+    .delete((req,res)=>{
+        const {commentNo} = req.query;
+        const query = `DELETE FROM REACT_COMMENT WHERE COMMENT_NO = ?`;
+        connection.query(query,[commentNo],(err,results)=>{
+            if(err){
+                return res.json({success : false , message : "댓글삭제 실패"});
+            };
+            res.json({success : true , message : "댓글을 삭제하였습니다."});
+        })
+    })
 router.route("/board/:boardNo")
     .get((req,res)=>{
         const boardNo = req.params.boardNo;
-        console.log("지금!!!!!!!!!!!!"+boardNo);
         const query = `SELECT 
                         B.BOARD_NO, 
                         B.USER_ID, 
@@ -113,7 +132,6 @@ router.route("/board/:boardNo")
                 console.log("실패");
                 return res.json({success : false , message : "실패"});
             };
-            console.log("지금!!!!!!!!!!!!"+JSON.stringify(results[0], null, 2));
             res.json({ success: true, boardDetail: results[0] });
         })
     })

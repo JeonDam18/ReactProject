@@ -10,7 +10,6 @@ const JWT_KEY ="secret_key";
 router.route("/idcheck")
     .post((req,res)=>{
         const {userId} =req.body;
-        console.log(req.body);
         const query ='SELECT * FROM REACT_USER WHERE USER_ID = ?';
         connection.query(query,[userId],(err,results)=>{
             if(results.length > 0){
@@ -23,7 +22,6 @@ router.route("/idcheck")
 router.route("/join")
     .post((req,res)=>{
         const {userId,password,name,nickname,phone,email} = req.body;
-        console.log(req.body);
         const query = 'INSERT INTO REACT_USER(USER_ID,PASSWORD,NAME,NICKNAME,PHONE,EMAIL) VALUES (?,?,?,?,?,?)';
         connection.query(query,[userId,password,name,nickname,phone,email],(err,results)=>{
             if(err){
@@ -36,14 +34,12 @@ router.route("/join")
 router.route("/login")
     .post((req,res)=>{
         const {userId,password} =req.body;
-        console.log(req.body);
         const query ='SELECT * FROM REACT_USER WHERE USER_ID = ? AND PASSWORD = ?';
         connection.query(query,[userId,password],(err,results)=>{
             if(err) throw err;
             if(results.length > 0){
                 const user = results[0];
                 const token = jwt.sign({userId : user.USER_ID,name : user.NAME,nickname : user.NICKNAME},JWT_KEY,{expiresIn : '6h'})
-                console.log(token);
                 res.json({success : true ,message : "Login success" , token : token});
             }else{
                 res.json({success : false, message : "Login fail"});

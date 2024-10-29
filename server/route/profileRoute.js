@@ -63,7 +63,6 @@ router.route("/list")
 router.route("/follower")
     .get((req,res)=>{
         const {follower} = req.query;
-        console.log({follower});
         const query = `SELECT 
                             COUNT(*) AS follow_id_count, 
                             (SELECT COUNT(*) FROM react_follow WHERE FOLLOWER_ID = ?) AS follower_id_count
@@ -76,7 +75,6 @@ router.route("/follower")
                 return res.json({success : false , mesaage :"실패"});
             };
             res.json({success : true , followCount : results[0]});
-            console.log(results[0]);
         })
     })
 module.exports = router; 

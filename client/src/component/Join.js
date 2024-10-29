@@ -18,7 +18,6 @@ function Join() {
     //     setProfileImage(event.target.files[0]);
     // };
     async function handleSubmit(){
-        console.log(userIdRef.current.value);
         if(!idDuplicate){
             alert("Please perform a duplicate ID check first.");
             return;

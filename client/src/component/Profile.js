@@ -30,8 +30,6 @@ async function profileDetail(userId){
             params : {userId}
         });
         if(res.data.success){
-            console.log("데이터가져옴");
-            console.log(res.data.boardDetail);
             setUserDetail(res.data.boardDetail);
             setFollowId(res.data.boardDetail.USER_ID);
         }
@@ -69,13 +67,11 @@ async function handleFollowing(follower) {
 }
 async function handleFollowCount(){
     try {
-        console.log("이거 팔로우 아이디 "+ followId);
         const res = await axios.get(`http://localhost:3100/profile/follower`,{
             params: { follower: followId }
         })
         if(res.data.success){
             setFollowCount(res.data.followCount);
-            console.log(followCount);
         }else{
             console.log("에러")
         }
@@ -100,16 +96,13 @@ const closePopup = () => {
             }}>홈</a>
             <a href="#" onClick={() => {
                 navigate(`/profile/${dToken.userId}`);
-                console.log(dToken.userId);
             }}>프로필</a>
-            <a href="#">검색</a>
             <a href="#" onClick={() => { navigate("/login"); }}>로그아웃</a>
             <a href="#" onClick={() => { navigate("/feedInsert"); }}>
                 <img className="icon" src="http://localhost:3100/img/add.png" alt="추가" />
             </a>
         </aside>
         <div className="profile-container">
-            <a href="#" onClick={() => { navigate("/main"); }}>홈으로</a>
             <div className="profile-header">
                 <div className="profile-info">
                     <h2 className="nickname">{userDetail.NICKNAME}</h2>

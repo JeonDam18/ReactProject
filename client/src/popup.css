@@ -64,3 +64,36 @@
 .comment-content {
     margin-left: 5px;
 }
+.comment-input {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.comment-input-box {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #dbdbdb;
+    padding: 10px 0;
+    font-size: 14px;
+    outline: none;
+}
+
+.comment-input-box:focus {
+    border-bottom: 1px solid #0095f6;
+}
+
+.emoji-button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #0095f6;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.icon {
+    width: 20px;
+    max-width: 20px;
+    height: auto;
+}

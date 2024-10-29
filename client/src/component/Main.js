@@ -37,23 +37,19 @@ const handleChange = (boardNo, value) => {
 async function feedList(){
     const token =localStorage.getItem("token");
     try {
-        console.log("토큰 가져온거" + token);
         const res = await axios.get("http://localhost:3100/feed",{
             headers : {token : token}
         })
-        console.log(res.data.list);
         const postsWithImages = res.data.list.map(post => ({
             ...post,
             images: post.IMAGE_URLS ? post.IMAGE_URLS.split(',').map(url => ({ url })) : [] // 이미지 URL 배열 생성
         }));
         setFeedLists(postsWithImages);
-        console.log(postsWithImages);
     } catch (error) {
         console.log("피드 오류:", error.response ? error.response.data : error.message);
     }
 }
 async function likes(boardNo){
-    console.log("좋아요!!!! "+boardNo);
     try {
         const res = await axios.put(`http://localhost:3100/feed/like/${boardNo}`,{
             userId : dToken.userId , boardNo : boardNo
@@ -68,14 +64,11 @@ async function likes(boardNo){
 }
 
 async function handleComment(boardNo) {
-    console.log(dToken.userId);
-    console.log(inputComment);
     try {
         const res = await axios.put(`http://localhost:3100/feed/${boardNo}`,{
             userId :  dToken.userId, contents : inputComment[boardNo]
         })
         if(res.data.success){
-            console.log("댓글입력함");
             openComments(boardNo);
         }
     } catch (error) {
@@ -90,9 +83,7 @@ async function handleComment(boardNo) {
                 <a href="#">홈</a>
                 <a href="#" onClick={()=>{
                     navigate(`/profile/${dToken.userId}`);
-                    console.log(dToken.userId);
                     }}>프로필</a>
-                <a href="#">검색</a>
                 <a href="#" onClick={()=>{navigate("/login")}}>로그아웃</a>
                 <a href="#" onClick={()=>{navigate("/feedInsert")}}><img className="icon" src="http://localhost:3100/img/add.png"/></a>
             </aside>
@@ -126,7 +117,6 @@ async function handleComment(boardNo) {
                                 <p className="board-contents">{feed.BOARD_CONTENTS}</p>
                                 <div className="actions">
                                     <span className="like" onClick={()=>{
-                                        console.log(feed.BOARD_NO);
                                         likes(feed.BOARD_NO);
                                     }}><img className="icon" src="http://localhost:3100/img/fullheart.png"/></span>
                                     <span>{feed.LIKE_COUNT}</span>
