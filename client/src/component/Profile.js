@@ -17,12 +17,14 @@ const [showPopup, setShowPopup] = useState(false);
 const [currentBoardNo, setCurrentBoardNo] = useState(null);
 const [followId , setFollowId] = useState();
 const [followCount , setFollowCount] = useState([]);
+const [feedCount,setFeedCount] = useState(0);
 const navigate = useNavigate();
 
 useEffect(()=>{
     profileDetail(userId);
     userFeedList(userId);
     handleFollowCount();
+    feedCounts();
 },[userId,followId])
 async function profileDetail(userId){
     try {
@@ -79,6 +81,20 @@ async function handleFollowCount(){
         console.log("fail!");
     }
 }
+async function feedCounts(){
+    try {
+        const res = await axios.get(`http://localhost:3100/profile/feedcount`,{
+            params : {userId}
+        })
+        if(res.data.success){
+            setFeedCount(res.data.feedCount.cnt);
+        }else{
+            console.log("fail");
+        }
+    } catch (error) {
+        
+    }
+}
 const openPopup = (boardNo) => {
     setCurrentBoardNo(boardNo);
     setShowPopup(true);
@@ -107,8 +123,9 @@ const closePopup = () => {
                 <div className="profile-info">
                     <h2 className="nickname">{userDetail.NICKNAME}</h2>
                     <div className="follower-info">
-                        <span className="followers">팔로워: <strong>{followCount.follower_id_count}</strong></span>
-                        <span className="following">팔로우: <strong>{followCount.follow_id_count}</strong></span>
+                        <span className="followers">팔로워 <strong>{followCount.follower_id_count}</strong></span>
+                        <span className="following">팔로우 <strong>{followCount.follow_id_count}</strong></span>
+                        <span className="following">게시물 <strong>{feedCount}</strong></span>
                     </div>
                     <button className="follow-button" onClick={() => {
                         handleFollowing(userDetail.USER_ID);

@@ -77,4 +77,17 @@ router.route("/follower")
             res.json({success : true , followCount : results[0]});
         })
     })
+router.route("/feedcount")
+    .get((req,res)=>{
+        const {userId} = req.query;
+        console.log({userId});
+        const query = `SELECT COUNT(*) AS cnt FROM REACT_BOARD WHERE USER_ID = ?`;
+        connection.query(query,[userId],(err,results)=>{
+            if(err){
+                return res.json({success : false , message : "실패"});
+            }
+            console.log("카운트!!!!!!!!!"+results);
+            res.json({success : true , feedCount : results[0] });
+        })
+    })
 module.exports = router; 
