@@ -1,8 +1,8 @@
-# 전담의 React,Node.js를 활용한 SNS
+# SNS Using React and Node.js
 
-## 💿프로젝트 소개
+## 💿Project Overview
 
-+ React.js와 Node.js를 활용하여 SNS웹페이지를 구현하였습니다. 해당 페이지는 사용자간 팔로우,팔로잉,피드 등록 및 좋아요,댓글기능들을 구현하였습니다.
++ I developed an SNS web page using React.js and Node.js. This platform includes features such as following and followers, feed creation, likes, and comments.
 
 ## 📆개발 기간
 
