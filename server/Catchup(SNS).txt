@@ -2,54 +2,43 @@
 
 [Client]
 
-1)Login.js
-해당 페이지는 로그인을 하는 페이지로 회원가입화면으로 이동 또는 로그인을 할수있습니다.
+1) Login.js  
+This page is for logging in, where users can either navigate to the sign-up screen or log in.
 
-2)Join.js
-회원가입화면으로 아이디 중복체크 및 회원의 기본적인 정보를 입력하여 회원가입하는 화면입니다.
+2) Join.js  
+This is the sign-up page where users can check for duplicate IDs and input basic information to register.
 
-3)Main.js
-메인화면으로 기본적으로 가장 최근에 등록된 피드를 기준으로 화면에 보여주고
-좌측탭에는 Sidebar로 홈,프로필,로그아웃,피드등록이 구현되어있습니다.
-피드에는 사용자의 닉네임으로 표시가 되며 사용자가 첨부한 이미지는 Swiper를 이용하여 마우스를 드래그하여 볼수있습니다.
-피드의 내용과 등록일이 표시가 되어있고 좋아요 버튼과 수가 나타나있습니다.
-댓글을 등록할수있도록 되어있습니다.
+3) Main.js  
+This is the main screen that shows the most recently registered feeds by default. On the left tab, a Sidebar is implemented with links to Home, Profile, Logout, and Feed Registration. Feeds are displayed with the user's nickname, and any images the user attached can be viewed by dragging the mouse using Swiper. The feed's content and registration date are shown, and a like button with a like count is displayed. Users can also leave comments.
 
-4)CommentPopup.js
-피드의 댓글보기를 클릭할시 팝업창으로 피드와 댓글이 함께 나타납니다. 본인이 남긴 댓글을 삭제할수있고
-본인이 등록한 피드또한 삭제할수있습니다. 댓글을 남긴 닉네임을 클릭시 사용자의 프로필 화면으로 이동합니다.
+4) CommentPopup.js  
+When clicking the comment view on a feed, a popup appears displaying the feed and its comments. Users can delete their own comments and the feed they posted. Clicking on the nickname of the person who left a comment redirects to the user's profile page.
 
-5)Profile.js
-프로필 화면으로 사용자의 팔로워,팔로잉,피드의 수가 나타납니다.
-사용자가 등록한 피드들이 나열이 되며 프로필상의 피드는 대표 이미지로만 나열이 되며 클릭시 팝업페이지로
-피드의 상세 내용을 확인할수있습니다.
+5) Profile.js  
+This is the profile page showing the user's followers, following, and the number of feeds. The user's registered feeds are listed, and on the profile page, only the representative image of the feed is displayed. Clicking on the image opens a popup page where the detailed feed content can be viewed.
 
-6)FeedInsert.js
-피드를 등록하는 페이지로 기본적인 피드의 내용과 이미지를 multer를 이용하여 여러개의 이미지를
-첨부할수있습니다.
+6) FeedInsert.js  
+This page allows users to register a feed, where the basic content and images of the feed can be attached. Multiple images can be added using multer.
 
-7)App.js
-각 component의 파일을 import하여 경로를 지정해주었습니다.
+7) App.js  
+This file imports each component and specifies the routing paths.
 
-8)login.css , join.css , style.css , popup.css , profile.css , add.css
-각 component파일의 css입니다.
+8) login.css, join.css, style.css, popup.css, profile.css, add.css  
+These are the CSS files for each component.
 
 [Server]
 
-1)feedRoute.js
-피드에 관한 Router로 피드조회 및 삭제,댓글 조회,입력 및 삭제,좋아요 입력 및 취소,피드 등록에 관한
-쿼리 및 client에서 보낸 파라미터값을 request,response가 구현되어있습니다.
+1) feedRoute.js  
+This router handles queries related to feeds, such as viewing and deleting feeds, viewing and posting comments, adding and removing likes, and registering feeds. It handles parameters sent by the client in the request and response.
 
-2)profileRoute.js
-프로필에 관한 Router로 해당 사용자의 프로필 조회,팔로우 조회,등록 및 취소,피드이미지 조회에 관한
-쿼리 및 client에서 보낸 파라미터값을 request,response가 구현되어있습니다.
+2) profileRoute.js  
+This router handles queries related to profiles, such as viewing a user's profile, checking and managing follows, and retrieving feed images. It processes parameters sent by the client in the request and response.
 
-3)userRoute.js
-사용자에 관한 Router로 회원가입시 아이디 중복체크,회원가입,로그인에 관한
-쿼리 및 client에서 보낸 파라미터값을 request,response가 구현되어있습니다.
+3) userRoute.js  
+This router handles queries related to users, such as checking for duplicate IDs, sign-ups, and logins. It processes parameters sent by the client in the request and response.
 
-4)db.js
-Database접속에 관한 설정이 입력되어있습니다.
+4) db.js  
+This file contains the settings for database connection.
 
-5)server1.js
-client에서 요청하는 주소에 관한 router의 매칭이 입력되어있습니다.
+5) server1.js  
+This file handles routing and matching the client’s requested URLs to the appropriate routers.
