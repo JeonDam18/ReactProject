@@ -4,7 +4,7 @@
 
 + I developed an SNS web page using React.js and Node.js. This platform includes features such as following and followers, feed creation, likes, and comments.
 
-## 📆개발 기간
+## 📆Development period
 
 + 2024.10.23 ~ 2024.10.29
 
@@ -19,24 +19,24 @@
 
 <img src="https://img.shields.io/badge/visual%20studio%20code-%23007ACC.svg?&style=for-the-badge&logo=visual%20studio%20code&logoColor=white" />
 
-## 📈구현 과정
+## 📈Implementation process
 
-1. 아이디어 구상
-  + 기본적인 SNS를 구현하게 되었습니다. 가장 대표적인 Instagram을 모티브하여 제작을 했습니다.
+1. Idea Conceptualization
+  + The project was based on creating a basic social media platform, inspired by Instagram.
 
-2. DB설계
-  + 회원가입을 위한 사용자 테이블
-  + 피드 테이블
-  + 피드에 첨부될 이미지의 경로가 저장되는 첨부파일 테이블
-  + 피드의 '좋아요' 기능을 위한 테이블
-  + 피드의 댓글기능을 위한 테이블
-  + 사용자간의 팔로우 테이블
+2. Database Design
+  + User table for sign-up
+  + Feed table
+  + Attachments table to store image paths for posts
+  + Table for "likes" on posts
+  + Table for comments on posts
+  + Table for user following relationships
     
-3. 기능구현
- + 기본적인 SNS(INSTAGRAM)을 기반으로 기능을 구현하였습니다. REACT와 NODE의 이해도를 높이기위해 주로 사용하였고
- + 피드의 CRUD와 좋아요,댓글,팔로우에 대한 기능구현
- + 다중 첨부파일 기능 구현
- + 팝업창으로 이미지 스와이프
+3. Feature Implementation
+ + Implemented core social media features (Instagram-like) using React and Node.js to improve understanding of both technologies
+ + Created CRUD functionality for posts, and implemented like, comment, and follow features
+ + Developed multi-file attachment functionality
+ + Added image swipe feature via a popup window
 
 
 ## 🔎Page detail
